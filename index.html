@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PoyaLoTer Panel | WireGuard Manager — Light Edition</title>
+    <!-- Google Fonts: clean modern sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free, used as vector icons, not stickers) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F4F7FC;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+            color: #1A2C3E;
+        }
+
+        /* light glassmorphism with shadow */
+        .card-light {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(0px);
+            border: 1px solid rgba(0, 110, 255, 0.15);
+        }
+
+        .btn-primary-light {
+            background: linear-gradient(105deg, #0066FF, #0099FF);
+            border: none;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,102,255,0.2);
+        }
+        .btn-primary-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -10px #0066FF70;
+            background: linear-gradient(105deg, #1A75FF, #00AAFF);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            border: 1px solid #B8D1FF;
+            color: #0066CC;
+            font-weight: 500;
+        }
+        .btn-outline-light:hover {
+            background: #EFF4FF;
+            border-color: #3399FF;
+        }
+
+        .input-light {
+            background: #FFFFFF;
+            border: 1px solid #DDE3ED;
+            border-radius: 1.2rem;
+            padding: 0.85rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #0F2B3D;
+            transition: 0.2s;
+        }
+        .input-light:focus {
+            outline: none;
+            border-color: #3399FF;
+            box-shadow: 0 0 0 3px rgba(51,153,255,0.2);
+        }
+
+        .badge-light {
+            background: #EFF3F9;
+            border-radius: 2rem;
+            padding: 0.3rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1E4A76;
+        }
+
+        .config-item-light {
+            background: #FFFFFF;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid #2B7EFF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+        .config-item-light:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .status-active-light {
+            background: #10B981;
+            color: white;
+            border-radius: 30px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .status-inactive-light {
+            background: #94A3B8;
+            color: white;
+            border-radius: 30px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.7rem;
+        }
+
+        .timer-light {
+            font-family: 'Inter', monospace;
+            background: #F1F5F9;
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tab-btn-light {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1.6rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            color: #3B5C7E;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab-active-light {
+            background: #FFFFFF;
+            color: #0066FF;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+            border: 1px solid #E2E8F0;
+        }
+
+        pre {
+            font-family: 'Inter', monospace;
+            background: #F8FAFE;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            font-size: 0.7rem;
+            color: #1E2F4A;
+            border: 1px solid #E2EDFF;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        hr {
+            border-color: #E2EEFF;
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN CARD - LIGHT THEME -->
+<div id="loginWrapper" style="max-width: 500px; margin: 8vh auto;">
+    <div class="card-light" style="padding: 2rem; text-align: center;">
+        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #0066FF, #66CCFF); border-radius: 30px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-shield-halos" style="font-size: 2.2rem; color: white;"></i>
+        </div>
+        <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.3px; background: linear-gradient(145deg, #003D8C, #0099FF); -webkit-background-clip: text; background-clip: text; color: transparent;">PoyaLoTer Panel</h1>
+        <p style="color: #3D6A9A; margin-top: 8px;">enter secure license key</p>
+        <div style="margin: 14px 0; font-size: 0.8rem;"><i class="fab fa-telegram"></i> @PyLTR | <i class="fab fa-telegram"></i> @PoyaLoTer_Codm</div>
+        <input type="text" id="loginKeyInput" class="input-light" style="width: 100%; margin: 1rem 0;" placeholder="Buy key Tg : @PyLTR">
+        <button id="doLoginBtn" class="btn-primary-light" style="width: 100%; padding: 0.9rem; border-radius: 3rem; font-weight: bold;">Unlock Portal <i class="fas fa-arrow-right"></i></button>
+        <div class="badge-light" style="margin-top: 1.5rem; display: inline-block;">⚡ each key has independent expiration</div>
+    </div>
+</div>
+
+<!-- MAIN DASHBOARD (light) -->
+<div id="mainApp" style="display: none; max-width: 1400px; margin: 0 auto;">
+    <div class="card-light" style="padding: 1.8rem;">
+        <!-- header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid #E2EAF5; padding-bottom: 1rem;">
+            <div>
+                <h2 style="font-weight: 800; font-size: 1.8rem; letter-spacing: -0.2px;"><span style="color:#0066FF;">PoyaLoTer</span> WireGuard Engine</h2>
+                <div style="display: flex; gap: 1rem; margin-top: 8px; color:#5478A0;">
+                    <span><i class="fab fa-telegram"></i> @PyLTR</span>
+                    <span><i class="fab fa-telegram"></i> @PoyaLoTer_Codm</span>
+                </div>
+            </div>
+            <div class="badge-light" style="display: flex; gap: 0.5rem; align-items: center;">
+                <i class="fas fa-key"></i> <strong id="activeLicenseLabel"></strong>
+                <span id="licenseLiveTimer" class="timer-light"><i class="far fa-hourglass"></i> --</span>
+                <button id="logoutMainBtn" class="btn-outline-light" style="padding: 0.3rem 1rem; border-radius: 2rem;">Exit</button>
+            </div>
+        </div>
+
+        <!-- tabs -->
+        <div style="display: flex; gap: 0.5rem; margin: 1.5rem 0 1.2rem;">
+            <button class="tab-btn-light tab-active-light" data-tab="buildTab">Build Config</button>
+            <button class="tab-btn-light" data-tab="historyTab">History & Control</button>
+            <button class="tab-btn-light" data-tab="licenseTab">License Status</button>
+        </div>
+
+        <!-- BUILD TAB -->
+        <div id="buildTab" style="display: block;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- left form -->
+                <div class="card-light" style="padding: 1.5rem;">
+                    <h3><i class="fas fa-cog"></i> WireGuard Parameters</h3>
+                    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="text" id="wgConfigName" class="input-light" placeholder="Config name (e.g., MyVPN)" value="PoyaLoTer-Node">
+                        <select id="wgVolumeSelect" class="input-light">
+                            <option value="0.5">500 MB</option>
+                            <option value="1" selected>1 GB</option>
+                            <option value="5">5 GB</option>
+                            <option value="10">10 GB</option>
+                            <option value="25">25 GB</option>
+                            <option value="50">50 GB</option>
+                            <option value="100">100 GB</option>
+                        </select>
+                        <input type="number" id="wgDaysInput" class="input-light" placeholder="Validity (days)" value="7" min="1">
+                        <input type="number" id="wgMaxUsersInput" class="input-light" placeholder="Max users (simultaneous)" value="2" min="1">
+                        <select id="wgOperatorSelect" class="input-light">
+                            <option value="Irancell">📶 Irancell</option>
+                            <option value="Hamrah Aval">📱 Hamrah Aval</option>
+                            <option value="Shatel">🛰️ Shatel</option>
+                            <option value="WiFi">📡 WiFi</option>
+                            <option value="All">🌍 All Operators</option>
+                        </select>
+                        <button id="generateExactWG" class="btn-primary-light" style="padding: 0.9rem; border-radius: 3rem;"><i class="fas fa-bolt"></i> Generate .conf (exact engine)</button>
+                    </div>
+                </div>
+                <!-- right preview -->
+                <div class="card-light" style="padding: 1.5rem;">
+                    <h3><i class="fas fa-code"></i> Live Config Preview</h3>
+                    <pre id="exactConfigPreview" style="margin-top: 1rem; max-height: 320px; overflow: auto;">⚙️ Fill details and press generate</pre>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button id="copyExactBtn" class="btn-outline-light" style="flex:1; border-radius: 2rem;"><i class="fas fa-copy"></i> Copy</button>
+                        <button id="downloadExactBtn" class="btn-primary-light" style="flex:1; border-radius: 2rem;"><i class="fas fa-download"></i> Download .conf</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div id="historyTab" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3><i class="fas fa-database"></i> WireGuard History & Live Control</h3>
+                <span class="badge-light">Active configs: <span id="activeCountBadge">0</span></span>
+            </div>
+            <div id="historyContainer" style="max-height: 550px; overflow-y: auto; padding-right: 6px;"></div>
+        </div>
+
+        <!-- LICENSE TAB -->
+        <div id="licenseTab" style="display: none;">
+            <div class="card-light" style="padding: 2rem; text-align: center;">
+                <div style="width: 70px; height: 70px; background: #EFF6FF; border-radius: 30px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-medal" style="font-size: 2.5rem; color: #2B7EFF;"></i>
+                </div>
+                <h3 style="margin: 0.8rem 0;">License Information</h3>
+                <p><strong>Key:</strong> <span id="licenseKeySpan"></span></p>
+                <p><strong>Valid Until:</strong> <span id="expiryDateSpan"></span></p>
+                <div id="licenseRemainingBar" class="timer-light" style="display: inline-block; margin-top: 0.5rem;"></div>
+                <p style="margin-top: 1rem; font-size: 0.8rem;"><i class="fas fa-sync-alt"></i> Timer runs even when panel is closed</p>
+                <button id="refreshLicBtn" class="btn-outline-light" style="margin-top: 1.2rem; border-radius: 2rem;">⟳ Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- EXACT ORIGINAL WIREGUARD GENERATION (user script) ----------
+    function generateRandomString(length) {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+    function generateIPv6(prefix) {
+        return prefix + Array(7).fill().map(() => Math.floor(Math.random() * 65536).toString(16).padStart(4, '0')).join(':') + '/32';
+    }
+    function generateIPv4() {
+        return Array(4).fill().map(() => Math.floor(Math.random() * 256)).join('.');
+    }
+    function generateIPv4WithCIDR() {
+        return Array(2).fill().map(() => Math.floor(Math.random() * 256)).join('.') + '.0.0/16';
+    }
+
+    function buildWireguardExact(name, sizeGB, days, maxUsers, operator) {
+        const privateKey = generateRandomString(42) + 'c=';
+        const publicKey = generateRandomString(42) + 'c=';
+        const address = generateIPv6('23cc:');
+        const allowedIPs = generateIPv4WithCIDR();
+        const endpoint = '162.159.192.14:955';
+        const dns = `10.202.10.10, ${generateIPv4()}, ${generateIPv4()}, ${generateIPv4()}, ${generateIPv4()}`;
+        const persistentKeepalive = 25;
+
+        const meta = `# =============================================
+# PoyaLoTer Panel | WireGuard Profile
+# Name: ${name} | Volume: ${sizeGB} GB | Days: ${days}
+# Max Users: ${maxUsers} | Operator: ${operator}
+# Generated: ${new Date().toLocaleString()}
+# =============================================`;
+
+        const configText = `${meta}
+
+[Interface]
+PrivateKey = ${privateKey}
+Address = ${address}
+DNS = ${dns}
+
+[Peer]
+PublicKey = ${publicKey}
+Endpoint = ${endpoint}
+AllowedIPs = ${allowedIPs}
+PersistentKeepalive = ${persistentKeepalive}`;
+        return configText;
+    }
+
+    // ------------- LICENSE SYSTEM -------------
+    const SECRET_LICENSES = {
+        "POYA-30DAYS": 30
+    };
+    const STORAGE_LICENSE_KEY = "PoyaActiveLicense";
+    const STORAGE_LICENSE_START = "PoyaLicenseStart";
+
+    function getLicenseRemainingDays(license, startISO) {
+        if (!SECRET_LICENSES[license]) return 0;
+        const start = new Date(startISO);
+        const now = new Date();
+        const elapsed = (now - start) / (1000*3600*24);
+        const remaining = SECRET_LICENSES[license] - elapsed;
+        return remaining > 0 ? remaining : 0;
+    }
+
+    function isLicenseActive() {
+        const lic = localStorage.getItem(STORAGE_LICENSE_KEY);
+        const start = localStorage.getItem(STORAGE_LICENSE_START);
+        if (!lic || !start || !SECRET_LICENSES[lic]) return false;
+        return getLicenseRemainingDays(lic, start) > 0;
+    }
+
+    function activateLicense(key) {
+        const trimmed = key.trim();
+        if (!SECRET_LICENSES[trimmed]) return false;
+        localStorage.setItem(STORAGE_LICENSE_KEY, trimmed);
+        localStorage.setItem(STORAGE_LICENSE_START, new Date().toISOString());
+        return true;
+    }
+
+    function logoutPanel() {
+        localStorage.removeItem(STORAGE_LICENSE_KEY);
+        localStorage.removeItem(STORAGE_LICENSE_START);
+        document.getElementById("mainApp").style.display = "none";
+        document.getElementById("loginWrapper").style.display = "block";
+    }
+
+    // ------------- Config storage (per license) -------------
+    function getConfigStorageKey() {
+        const lic = localStorage.getItem(STORAGE_LICENSE_KEY);
+        if (!lic) return null;
+        return `WG_History_${lic}`;
+    }
+
+    function loadAllConfigs() {
+        const key = getConfigStorageKey();
+        if (!key) return [];
+        const raw = localStorage.getItem(key);
+        if (!raw) return [];
+        try { return JSON.parse(raw); } catch(e) { return []; }
+    }
+
+    function saveAllConfigs(configs) {
+        const key = getConfigStorageKey();
+        if (key) localStorage.setItem(key, JSON.stringify(configs));
+    }
+
+    function addNewConfig(configObj) {
+        let configs = loadAllConfigs();
+        configs.push(configObj);
+        saveAllConfigs(configs);
+        renderHistory();
+        updateActiveStats();
+    }
+
+    function deleteConfigById(id) {
+        let configs = loadAllConfigs();
+        configs = configs.filter(c => c.id !== id);
+        saveAllConfigs(configs);
+        renderHistory();
+        updateActiveStats();
+    }
+
+    function toggleConfigStatus(id) {
+        let configs = loadAllConfigs();
+        const idx = configs.findIndex(c => c.id === id);
+        if (idx !== -1) {
+            configs[idx].isActive = !configs[idx].isActive;
+            saveAllConfigs(configs);
+            renderHistory();
+            updateActiveStats();
+        }
+    }
+
+    function updateActiveStats() {
+        const configs = loadAllConfigs();
+        const active = configs.filter(c => c.isActive === true && new Date(c.expiresAt) > new Date()).length;
+        document.getElementById("activeCountBadge") && (document.getElementById("activeCountBadge").innerText = active);
+    }
+
+    function renderHistory() {
+        const container = document.getElementById("historyContainer");
+        if (!container) return;
+        let configs = loadAllConfigs();
+        if (configs.length === 0) {
+            container.innerHTML = `<div class="card-light" style="padding:2rem; text-align:center;"><i class="fas fa-history"></i> No WireGuard configs built yet.</div>`;
+            return;
+        }
+        let html = "";
+        const now = new Date();
+        configs.forEach(cfg => {
+            const expiry = new Date(cfg.expiresAt);
+            const remainingMs = expiry - now;
+            let timeStr = "";
+            if (remainingMs <= 0) timeStr = "<span style='color:#D97706;'>Expired</span>";
+            else {
+                const days = Math.floor(remainingMs / 86400000);
+                const hours = Math.floor((remainingMs % 86400000) / 3600000);
+                timeStr = `${days}d ${hours}h left`;
+            }
+            const activeBadgeHtml = cfg.isActive ? '<span class="status-active-light">● ACTIVE</span>' : '<span class="status-inactive-light">○ INACTIVE</span>';
+            html += `
+                <div class="config-item-light">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <div><i class="fas fa-shield-alt"></i> <strong>${escapeHtml(cfg.name)}</strong> ${activeBadgeHtml}</div>
+                        <div><span class="timer-light"><i class="far fa-clock"></i> ${timeStr}</span></div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 8px 0; font-size:0.85rem;">
+                        <span>📦 ${cfg.size} GB</span> <span>⏱️ ${cfg.days} days</span> 
+                        <span>👥 Max: ${cfg.maxUsers}</span> <span>📡 ${cfg.operator}</span>
+                    </div>
+                    <div style="display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap;">
+                        <button class="btn-outline-light" style="padding:0.3rem 1rem; border-radius:2rem;" onclick="window.toggleConfig(${cfg.id})"><i class="fas fa-power-off"></i> ${cfg.isActive ? 'Disable' : 'Enable'}</button>
+                        <button class="btn-outline-light" style="padding:0.3rem 1rem;" onclick="window.downloadConfigById(${cfg.id})"><i class="fas fa-download"></i> .conf</button>
+                        <button class="btn-outline-light" style="background:#FFF0F0; border-color:#FFB3B3;" onclick="window.deleteConfigById(${cfg.id})"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    window.toggleConfig = toggleConfigStatus;
+    window.deleteConfigById = deleteConfigById;
+    window.downloadConfigById = (id) => {
+        const configs = loadAllConfigs();
+        const target = configs.find(c => c.id === id);
+        if (target) {
+            const blob = new Blob([target.configText], {type: "text/plain"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${target.name.replace(/[^a-z0-9]/gi, '_')}.conf`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+    };
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) { if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});
+    }
+
+    // generate and store
+    function generateAndStore() {
+        const name = document.getElementById("wgConfigName").value.trim() || "PoyaLoTer-Config";
+        const volumeValue = document.getElementById("wgVolumeSelect").value;
+        const sizeLabel = volumeValue + (volumeValue.includes('GB') ? '' : ' GB');
+        const days = parseInt(document.getElementById("wgDaysInput").value);
+        const maxUsers = parseInt(document.getElementById("wgMaxUsersInput").value);
+        const operator = document.getElementById("wgOperatorSelect").value;
+        if (isNaN(days) || days < 1) { alert("Days must be at least 1"); return; }
+        const configText = buildWireguardExact(name, volumeValue, days, maxUsers, operator);
+        document.getElementById("exactConfigPreview").innerText = configText;
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + days);
+        const newConfig = {
+            id: Date.now(),
+            name: name,
+            size: sizeLabel,
+            days: days,
+            maxUsers: maxUsers,
+            operator: operator,
+            configText: configText,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            expiresAt: expiresAt.toISOString()
+        };
+        addNewConfig(newConfig);
+        alert(`✅ Config "${name}" added to history!`);
+    }
+
+    function updateLicenseUIAndCheck() {
+        if (!isLicenseActive()) {
+            logoutPanel();
+            return false;
+        }
+        const lic = localStorage.getItem(STORAGE_LICENSE_KEY);
+        const start = localStorage.getItem(STORAGE_LICENSE_START);
+        const remainingDays = getLicenseRemainingDays(lic, start);
+        document.getElementById("activeLicenseLabel") && (document.getElementById("activeLicenseLabel").innerText = lic);
+        document.getElementById("licenseKeySpan") && (document.getElementById("licenseKeySpan").innerText = lic);
+        const expiryDate = new Date(new Date(start).getTime() + (SECRET_LICENSES[lic] * 86400000));
+        document.getElementById("expiryDateSpan") && (document.getElementById("expiryDateSpan").innerText = expiryDate.toLocaleString());
+        const remainText = `${remainingDays.toFixed(1)} days remaining`;
+        document.getElementById("licenseRemainingBar") && (document.getElementById("licenseRemainingBar").innerHTML = `<i class="fas fa-hourglass-half"></i> ${remainText}`);
+        document.getElementById("licenseLiveTimer") && (document.getElementById("licenseLiveTimer").innerHTML = `<i class="far fa-hourglass"></i> ${remainText}`);
+        return true;
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('#buildTab, #historyTab, #licenseTab').forEach(t => t.style.display = 'none');
+        document.getElementById(tabId).style.display = 'block';
+        document.querySelectorAll('.tab-btn-light').forEach(btn => btn.classList.remove('tab-active-light'));
+        document.querySelector(`.tab-btn-light[data-tab="${tabId}"]`).classList.add('tab-active-light');
+        if (tabId === 'historyTab') renderHistory();
+        if (tabId === 'licenseTab') updateLicenseUIAndCheck();
+    }
+
+    // DOM ready
+    document.addEventListener("DOMContentLoaded", () => {
+        if (isLicenseActive()) {
+            document.getElementById("loginWrapper").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            updateLicenseUIAndCheck();
+            renderHistory();
+            updateActiveStats();
+            setInterval(() => {
+                if (document.getElementById("mainApp").style.display === "block") {
+                    if (!isLicenseActive()) logoutPanel();
+                    else {
+                        updateLicenseUIAndCheck();
+                        renderHistory();
+                        updateActiveStats();
+                    }
+                }
+            }, 1000);
+        } else {
+            document.getElementById("loginWrapper").style.display = "block";
+            document.getElementById("mainApp").style.display = "none";
+        }
+
+        document.getElementById("doLoginBtn").addEventListener("click", () => {
+            const inputKey = document.getElementById("loginKeyInput").value;
+            if (activateLicense(inputKey)) {
+                document.getElementById("loginWrapper").style.display = "none";
+                document.getElementById("mainApp").style.display = "block";
+                updateLicenseUIAndCheck();
+                renderHistory();
+                updateActiveStats();
+            } else {
+                alert("Invalid license key! contact @PyLTR");
+            }
+        });
+
+        document.getElementById("logoutMainBtn") && document.getElementById("logoutMainBtn").addEventListener("click", logoutPanel);
+        document.getElementById("generateExactWG").addEventListener("click", generateAndStore);
+        document.getElementById("copyExactBtn").addEventListener("click", () => {
+            const txt = document.getElementById("exactConfigPreview").innerText;
+            if (txt && txt !== "⚙️ Fill details and press generate") {
+                navigator.clipboard.writeText(txt);
+                alert("Config copied to clipboard!");
+            } else alert("Generate a config first");
+        });
+        document.getElementById("downloadExactBtn").addEventListener("click", () => {
+            const txt = document.getElementById("exactConfigPreview").innerText;
+            const name = document.getElementById("wgConfigName").value.trim() || "wireguard_config";
+            if (txt && txt !== "⚙️ Fill details and press generate") {
+                const blob = new Blob([txt], {type: "text/plain"});
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${name.replace(/[^a-z0-9]/gi,'_')}.conf`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            } else alert("No config generated.");
+        });
+
+        document.querySelectorAll(".tab-btn-light").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const tab = btn.getAttribute("data-tab");
+                if (tab) switchTab(tab);
+            });
+        });
+        document.getElementById("refreshLicBtn") && document.getElementById("refreshLicBtn").addEventListener("click", () => updateLicenseUIAndCheck());
+    });
+</script>
+</body>
+</html>
